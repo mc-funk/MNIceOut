@@ -9,3 +9,13 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
     id: 'mc-funk.f3871617',
     accessToken: 'pk.eyJ1IjoibWMtZnVuayIsImEiOiJlMmVmNGU4YjI4ZDA5OTlmY2Y0N2Q1ODgwZGY3YjdiYSJ9.4oC-L5IUabXNY0wYIDI5UQ'
 }).addTo(map);
+
+$(document).ready(function() {
+    $("#getData").on("click", function(){
+        console.log("getData click worked");
+        app.get('/data', function(request, response) {
+            var url = hash(request.query.name);
+            response.send(url);
+        });
+    });
+});
