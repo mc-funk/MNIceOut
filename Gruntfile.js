@@ -1,3 +1,5 @@
+//TODO: clean grunt file to ensure all appropriate files are being provided by grunt
+
 module.exports = function(grunt) {
     grunt.initConfig ({
         pkg: grunt.file.readJSON('package.JSON'),

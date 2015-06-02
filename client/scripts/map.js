@@ -10,12 +10,46 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
     accessToken: 'pk.eyJ1IjoibWMtZnVuayIsImEiOiJlMmVmNGU4YjI4ZDA5OTlmY2Y0N2Q1ODgwZGY3YjdiYSJ9.4oC-L5IUabXNY0wYIDI5UQ'
 }).addTo(map);
 
+var queryYear = "";
+
+function getIceOut() {
+    console.log("Callback function called")
+}
+
+function processData(rawData) {
+    console.log("processData data: ", rawData)
+}
+
 $(document).ready(function() {
     $("#getData").on("click", function(){
         console.log("getData click worked");
-        app.get('/data', function(request, response) {
-            var url = hash(request.query.name);
-            response.send(url);
+        //TEMP VALUE: queryYear should be set by user input
+        queryYear = 1843;
+        if (queryYear.toString().length == 4) {
+            while (queryYear < 2015) {
+                queryYear = "?year=" + queryYear + "&callback=getIceOut"
+                $.ajax({
+                    type: 'GET',
+                    dataType: 'jsonp',
+                    jsonpCallback: 'getIceOut',
+                    crossDomain: true,
+                    url: 'http://services.dnr.state.mn.us/api/climatology/ice_out_by_year/v1/' + queryYear,
+                    success: function (data, textStatus, jqXHR) {
+                        //clearData();
+                        console.log("in success: ", data);
+                        processData(data);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                    },
+                    complete: function (jqXHR, textStatus) {
+                        console.log("getData() Ajax Get Complete:", textStatus);
+                    }
+                });
+            }
+        }else{
+            console.log("Invaid Year Call: " + queryYear)
+        }
+        console.log("queryYear: ", queryYear);
         });
     });
-});
