@@ -3,15 +3,15 @@
 module.exports = function(grunt) {
     grunt.initConfig ({
         pkg: grunt.file.readJSON('package.JSON'),
-        uglify: {
-            options: {
-                banner: '/*! <%pkg.name%><%=grunt.template.today("yyyy-mm-dd")%>*/\n'
-            },
-            map: {
-                src: 'client/scripts/map.js',
-                "dest": 'server/public/assets/scripts/map.min.js'
-            },
-        },
+        //uglify: {
+        //    options: {
+        //        banner: '/*! <%pkg.name%><%=grunt.template.today("yyyy-mm-dd")%>*/\n'
+        //    },
+        //    map: {
+        //        src: 'client/scripts/map.js',
+        //        "dest": 'server/public/assets/scripts/map.js'
+        //    },
+        //},
         copy: {
             main: {
                 expand: true,
@@ -42,14 +42,14 @@ module.exports = function(grunt) {
             iceout: {
                 expand: true,
                 cwd: "client/scripts/",
-                src: "iceout.js",
+                src: ["iceout.js", "map.js"],
                 "dest": 'server/routes/'
             }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
+    //grunt.loadNpmTasks('grunt-contrib-uglify');
 
-    grunt.registerTask('default', ['copy', 'uglify']);
+    grunt.registerTask('default', ['copy'/*, 'uglify'*/]);
 };

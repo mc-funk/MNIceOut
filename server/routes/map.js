@@ -86,33 +86,30 @@ function yearLoop() {
     var startYear = 1850;
     var endYear = 1855;
     for (j = startYear; j <= endYear; j++) {
-        (function(j){
-            setTimeout(function(){
-                var loopQuery = stopClosure(j);
-                console.log("yearLoop active for " + stopClosure(j));
-                $.ajax({
-                    type: 'GET',
-                    dataType: 'jsonp',
-                    jsonpCallback: 'getIceOut',
-                    crossDomain: true,
-                    url: 'http://services.dnr.state.mn.us/api/climatology/ice_out_by_year/v1/' + loopQuery,
-                    success: function (data, textStatus, jqXHR) {
-                        //clearData();
-                        console.log("success achieved for: " + stopClosure(j));
-                        console.log("in success: ", data);
-                        //process year-level data for that year
-                        /*processYearData(data, thisYear);*/
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.log(textStatus, errorThrown);
-                    },
-                    complete: function (jqXHR, textStatus) {
-                        console.log("getData() Ajax Get Complete for year " + stopClosure(j) + ":", textStatus);
-                    }
-                });
-
-        }, (1000 * (j - startYear)))
-        })();
+        setTimeout(function(j) {
+            var loopQuery = "?year=" + j + "&callback=getIceOut";
+            console.log("yearLoop active for " + j + ", " + loopQuery);
+            $.ajax({
+                type: 'GET',
+                dataType: 'jsonp',
+                jsonpCallback: 'getIceOut',
+                crossDomain: true,
+                url: 'http://services.dnr.state.mn.us/api/climatology/ice_out_by_year/v1/' + loopQuery,
+                success: function (data, textStatus, jqXHR) {
+                    //clearData();
+                    console.log("success achieved for: " + j);
+                    console.log("in success: ", data);
+                    //process year-level data for that year
+                    /*processYearData(data, thisYear);*/
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus, errorThrown);
+                },
+                complete: function (jqXHR, textStatus) {
+                    console.log("getData() Ajax Get Complete for year " + j + ":", textStatus);
+                }
+            });
+        }, 1000 * (j - startYear));
     }
 }
 
@@ -120,10 +117,6 @@ function yearLoop() {
 //    console.log("getYearData called for ", thisQuery, " ", thisYear);
 //
 //}
-
-function stopClosure(int) {
-   return "?year=" + int + "&callback=getIceOut";
-}
 
 function processYearData(yearData, year) {
     console.log("yearData: ", yearData);
