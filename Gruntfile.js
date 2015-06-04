@@ -8,8 +8,8 @@ module.exports = function(grunt) {
         //        banner: '/*! <%pkg.name%><%=grunt.template.today("yyyy-mm-dd")%>*/\n'
         //    },
         //    map: {
-        //        src: 'client/scripts/map.js',
-        //        "dest": 'server/public/assets/scripts/map.js'
+        //        src: 'client/scripts/app.js',
+        //        "dest": 'server/public/assets/scripts/app.js'
         //    },
         //},
         copy: {
@@ -42,8 +42,14 @@ module.exports = function(grunt) {
             iceout: {
                 expand: true,
                 cwd: "client/scripts/",
-                src: ["iceout.js", "map.js"],
+                src: "iceout.js",
                 "dest": 'server/routes/'
+            },
+            app: {
+                expand: true,
+                cwd: "client/scripts/",
+                src: "app.js",
+                "dest": 'server/public/assets/scripts'
             }
         }
     });

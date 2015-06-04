@@ -86,10 +86,10 @@ function yearLoop() {
     var startYear = 1850;
     var endYear = 1855;
     for (j = startYear; j <= endYear; j++) {
-        (function(j){
+        (function(q){
             setTimeout(function(){
-                var loopQuery = stopClosure(j);
-                console.log("yearLoop active for " + stopClosure(j));
+                var loopQuery = "?year=" + q + "&callback=getIceOut";
+                console.log("yearLoop active for " + q);
                 $.ajax({
                     type: 'GET',
                     dataType: 'jsonp',
@@ -97,38 +97,39 @@ function yearLoop() {
                     crossDomain: true,
                     url: 'http://services.dnr.state.mn.us/api/climatology/ice_out_by_year/v1/' + loopQuery,
                     success: function (data, textStatus, jqXHR) {
-                        //clearData();
-                        console.log("success achieved for: " + stopClosure(j));
-                        console.log("in success: ", data);
                         //process year-level data for that year
-                        /*processYearData(data, thisYear);*/
+                        processYearData(data, q);
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         console.log(textStatus, errorThrown);
                     },
                     complete: function (jqXHR, textStatus) {
-                        console.log("getData() Ajax Get Complete for year " + stopClosure(j) + ":", textStatus);
+                        console.log("getData() Ajax Get Complete for year " + q + ":", textStatus);
                     }
                 });
 
-        }, (1000 * (j - startYear)))
-        })();
+        }, (1000 * (q - startYear)))
+        })(j);
     }
 }
 
-//function getYearData(thisQuery, thisYear) {
-//    console.log("getYearData called for ", thisQuery, " ", thisYear);
-//
-//}
-
-function stopClosure(int) {
-   return "?year=" + int + "&callback=getIceOut";
+function getYearData(thisQuery, thisYear) {
+    console.log("getYearData called for ", thisQuery, " ", thisYear);
 }
 
 function processYearData(yearData, year) {
     console.log("yearData: ", yearData);
     errorCheck = yearData["status"];
     if (errorCheck != "ERROR") {
-        console.log("yearData processed for year " + year + "; " + yearData.length + " lakes processed");
+        console.log("yearData processed for year " + year + "; " + yearData.results.length + " lakes processed");
+        for (i = 0; i < yearData.results.length; i++) {
+            /*console.log("For loop entered");*/
+            thisLake = yearData.results[i];
+            lakeName = thisLake["name"];
+            thisIceOut = thisLake["ice_out_date"];
+            /*console.log("lakeName: ", lakeName);*/
+            lakeData[lakeName]["allYears"].push([year, thisIceOut]);
+        }
+        console.log("Lake data after year: ", lakeData);
     }
 }

@@ -18,29 +18,28 @@ var lakeData = {};
 var numLakes = 0;
 var i = 0;
 
-//TODO: ensure queryYear is set to 2015
+//TODO: ensure correct timespan
 $(document).ready(function() {
     $("#getData").on("click", function() {
         console.log("getData click worked");
         $.ajax({
-                    type: 'GET',
-                    dataType: 'jsonp',
-                    jsonpCallback: 'getIceOut',
-                    crossDomain: true,
-                    url: 'http://services.dnr.state.mn.us/api/climatology/ice_out_by_year/v1/?callback=getIceOut',
-                    success: function (data, textStatus, jqXHR) {
-                        console.log("in success: ", data);
-                        //process lake-level data
-                        processLakeData(data);
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.log(textStatus, errorThrown);
-                    },
-                     complete: function (jqXHR, textStatus) {
-                        console.log("getData() Ajax Get Complete:", textStatus);
-                        yearLoop();
-                    }
-                });
+            type: 'GET',
+            dataType: 'jsonp',
+            jsonpCallback: 'getIceOut',
+            crossDomain: true,
+            url: 'http://services.dnr.state.mn.us/api/climatology/ice_out_by_year/v1/?callback=getIceOut',
+            success: function (data, textStatus, jqXHR) {
+                //process lake-level data
+                processLakeData(data);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            },
+            complete: function (jqXHR, textStatus) {
+                console.log("getData() Ajax Get Complete:", textStatus);
+                yearLoop();
+            }
+        });
     });
 });
 
@@ -57,7 +56,7 @@ function processLakeData(medianData) {
     numLakes = 0;
 
     /*Loop through array of lake data.
-    //ord lake-level data that is repeated in every entry for a given lake.*/
+     //ord lake-level data that is repeated in every entry for a given lake.*/
     for (i = 0; i < medianData.results.length; i++) {
         /*console.log("For loop entered");*/
         thisLake = medianData.results[i];
@@ -101,7 +100,7 @@ function yearLoop() {
                         console.log("success achieved for: " + q);
                         console.log("in success: ", data);
                         //process year-level data for that year
-                        /*processYearData(data, thisYear);*/
+                        processYearData(data, q);
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         console.log(textStatus, errorThrown);
@@ -111,24 +110,28 @@ function yearLoop() {
                     }
                 });
 
-        }, (1000 * (q - startYear)))
+            }, (1000 * (q - startYear)))
         })(j);
     }
 }
 
-//function getYearData(thisQuery, thisYear) {
-//    console.log("getYearData called for ", thisQuery, " ", thisYear);
-//
-//}
-//
-//function stopClosure(int) {
-//   return "?year=" + int + "&callback=getIceOut";
-//}
+function getYearData(thisQuery, thisYear) {
+    console.log("getYearData called for ", thisQuery, " ", thisYear);
+}
 
 function processYearData(yearData, year) {
     console.log("yearData: ", yearData);
     errorCheck = yearData["status"];
     if (errorCheck != "ERROR") {
         console.log("yearData processed for year " + year + "; " + yearData.length + " lakes processed");
+        for (i = 0; i < yearData.results.length; i++) {
+            /*console.log("For loop entered");*/
+            thisLake = yearData.results[i];
+            lakeName = thisLake["name"];
+            thisIceOut = thisLake["ice_out_date"];
+            /*console.log("lakeName: ", lakeName);*/
+            lakeData[lakeName]["allYears"].append([year, thisIceOut]);
+        }
+        console.log("Lake data after year: ", lakeData);
     }
 }
