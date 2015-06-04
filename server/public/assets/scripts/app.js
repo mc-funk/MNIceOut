@@ -14,16 +14,10 @@
 
 //var queryYear = 0;
 //var query="";
-var lakeData = {};
-var numLakes = 0;
-var thisLake;
-var lakeName = 0;
-var i = 0;
-var dQualArray = [];
-var startYear = 1850;
-var endYear = 1855;
-var earliestYear = [];
-var numEntries = [];
+var lakeData = {}, numLakes = 0, thisLake, lakeName = 0, i = 0, dQualArray = [],
+    earliestYear = [], numEntries = [], dectiles = [];
+//Initialize to stat and end dates for analysis
+var startYear = 1850, endYear = 1855;
 
 //TODO: ensure correct timespan
 $(document).ready(function() {
@@ -83,15 +77,23 @@ function processLakeData(medianData) {
         };
         numLakes++;
         dQualArray.push(dataQuality);
-        earliestYear.push(thisLake["ice_out_first_year"]);
-        numEntries.push(thisLake["ice_out_number_of_entries"]);
+        //earliestYear.push(thisLake["ice_out_first_year"]);
+        //numEntries.push(thisLake["ice_out_number_of_entries"]);
     }
-    processDataQuartiles(dQualArray);
-    processYear(earliestYear);
-    processDataQuartiles(numEntries);
+    dectiles = calcDectiles(dQualArray);
+    console.log("dectiles after calc: " + dectiles);
+    //processYear(earliestYear);
+    for (var k = 0; k < medianData.results.length; k++) {
+        console.log("Loop entered at: " + k);
+        thisLake = medianData.results[k];
+        lakeName = thisLake["name"];
+        console.log("lakeData[lakeName][dQuality]" + lakeData[lakeName]["dQuality"]);
+        console.log("thisLake[dQuality]", thisLake["dQuality"]);
+        lakeData[lakeName]["dectile"] = getDectile(lakeData[lakeName]["dQuality"]);
+    }
+    //processDataQuartiles(numEntries);
     console.log("lake data: ", lakeData);
     console.log("There are " + numLakes + " lakes");
-
 }
 
 function yearLoop() {
@@ -162,8 +164,7 @@ function writeToDb (thisLake, year) {
     iceOutMedian = thisLake["ice_out_median_since_1950"];
     //console.log("IceOutMedian: ", iceOutMedian);
     medianDiff = getMedianDiff(iceOutDate, iceOutMedian);
-    dQuartile = getDQuartile(thisLake);
-
+    dQuartile = getDectile(thisLake["dQuality"]);
 
     console.log("Lake: " + lake + " Year: " + year + " IceOutDate: " + iceOutDate + " IceOutMedian: " + iceOutMedian + " MedianDiff: " + medianDiff + " dQuartile: " + dQuartile);
 }
@@ -198,24 +199,27 @@ function getDataQuality(thisLake) {
     //console.log("Entries: " + entries);
     //console.log("Entries/Poss Years : " + entries / possibleYears);
     //console.log("Precise Round Test: " + precise_round(((entries / possibleYears) * 100),1));
-    console.log(precise_round(((entries / possibleYears) * 100),1));
+    //console.log(precise_round(((entries / possibleYears) * 100),1));
     return precise_round(((entries / possibleYears) * 100),1);
 }
-
-function getDQuartile(thisLake) {
-    return "test";
-}
-
-function processDataQuartiles(array) {
+function calcDectiles(array) {
     sortedArray = array.sort(sortNumber);
     console.log("sorted array: " + sortedArray);
+    var dectile = sortedArray.length/10;
+    return [array[dectile], array[dectile*2], array[dectile*3], array[dectile*4], array[dectile*5], array[dectile*6], array[dectile*7], array[dectile*8], array[dectile*9], array[dectile*10]];
 }
 
-function processYear(array) {
-    sortedArray = array.sort();
-    console.log("sorted array: " + sortedArray);
-}
+function getDectile(dQuality) {
+    console.log("Dectiles length: " + dectiles.length);
 
+    for (var l=0; l < dectiles.length + 1; l++) {
+        console.log("dquality: " + dQuality);
+        if (dQuality < dectiles[l]) {
+            console.log("Dectile calculated: " + (l+1) + " for " + thisLake[name] + " with dquality " + lakeData[lakeName]["dQuality"]);
+            return l + 1;
+        }
+    }
+}
 
 //Round based on number and desired number of decimals to round to
 //From: http://stackoverflow.com/questions/1726630/javascript-formatting-number-with-exactly-two-decimals
@@ -223,12 +227,11 @@ function precise_round(num,decimals){
     return Math.round(num*Math.pow(10,decimals))/Math.pow(10,decimals);
 }
 
-//Get days in a given month: http://stackoverflow.com/a/315767/4318362
-function daysInMonth(month,year) {
-    return new Date(year, month, 0).getDate();
-}
+//Facilitate numerical instead of alpha array.sort(): http://stackoverflow.com/questions/1063007/arr-sort-does-not-sort-integers-correctly
+function sortNumber(a,b) {return a - b; }
 
-//http://stackoverflow.com/questions/1063007/arr-sort-does-not-sort-integers-correctly
-function sortNumber(a,b) {
-    return a - b;
-}
+//Helper function created solely to track down inconsistencies in API data (takes in first_date)
+// function processYear(array) {
+//    sortedArray = array.sort();
+//    console.log("sorted array: " + sortedArray);
+//}
