@@ -22,7 +22,7 @@ var startYear = 1850, endYear = 1855;
 //TODO: ensure correct timespan
 $(document).ready(function() {
     $("#getData").on("click", function() {
-        console.log("getData click worked");
+        /*console.log("getData click worked");*/
         $.ajax({
             type: 'GET',
             dataType: 'jsonp',
@@ -37,7 +37,7 @@ $(document).ready(function() {
                 console.log(textStatus, errorThrown);
             },
             complete: function (jqXHR, textStatus) {
-                console.log("getData() Ajax Get Complete:", textStatus);
+                /*console.log("getData() Ajax Get Complete:", textStatus);*/
                 yearLoop();
             }
         });
@@ -45,17 +45,17 @@ $(document).ready(function() {
 });
 
 function getIceOut() {
-    console.log("Callback function called")
+    /*console.log("Callback function called")*/
 }
 
 function processLakeData(medianData) {
     /*Takes in and parses data returned from API query with no year specified, which returns median data.*/
-    console.log("Median data: ", medianData);
+    /*console.log("Median data: ", medianData);*/
     lakeData = {};
     numLakes = 0;
 
     /*Loop through array of lake data.
-     //ord lake-level data that is repeated in every entry for a given lake.*/
+     Record lake-level data that is repeated in every entry for a given lake.*/
     for (i = 0; i < medianData.results.length; i++) {
         /*console.log("For loop entered");*/
         thisLake = medianData.results[i];
@@ -81,19 +81,18 @@ function processLakeData(medianData) {
         //numEntries.push(thisLake["ice_out_number_of_entries"]);
     }
     dectiles = calcDectiles(dQualArray);
-    console.log("dectiles after calc: " + dectiles);
+    /*console.log("dectiles after calc: " + dectiles);*/
     //processYear(earliestYear);
     for (var k = 0; k < medianData.results.length; k++) {
-        console.log("Loop entered at: " + k);
+        /*console.log("Loop entered at: " + k);*/
         thisLake = medianData.results[k];
         lakeName = thisLake["name"];
-        console.log("lakeData[lakeName][dQuality]" + lakeData[lakeName]["dQuality"]);
-        console.log("thisLake[dQuality]", thisLake["dQuality"]);
+        /*console.log("lakeData[lakeName][dQuality]" + lakeData[lakeName]["dQuality"]);*/
         lakeData[lakeName]["dectile"] = getDectile(lakeData[lakeName]["dQuality"]);
     }
     //processDataQuartiles(numEntries);
-    console.log("lake data: ", lakeData);
-    console.log("There are " + numLakes + " lakes");
+    /*console.log("lake data: ", lakeData);
+    console.log("There are " + numLakes + " lakes");*/
 }
 
 function yearLoop() {
@@ -111,7 +110,7 @@ function yearLoop() {
                     url: 'http://services.dnr.state.mn.us/api/climatology/ice_out_by_year/v1/' + loopQuery,
                     success: function (data, textStatus, jqXHR) {
                         //clearData();
-                        console.log("success achieved for: " + q);
+                       /* console.log("success achieved for: " + q);*/
                         //console.log("in success: ", data);
                         //process year-level data for that year
                         processYearData(data, q);
@@ -120,10 +119,11 @@ function yearLoop() {
                         console.log(textStatus, errorThrown);
                     },
                     complete: function (jqXHR, textStatus) {
-                        console.log("getData() Ajax Get Complete for year " + q + ":", textStatus);
+                        if (q == endYear) {
+                            console.log("Lake data after year: ", lakeData);
+                        }
                     }
                 });
-
             }, (1000 * (q - startYear)))
         })(j);
     }
@@ -147,8 +147,6 @@ function processYearData(yearData, year) {
             lakeData[lakeName]["allYears"].push([year, thisIceOut]);
             writeToDb(thisLake, year);
         }
-        console.log("Lake data after year: ", lakeData);
-
     }
 }
 
@@ -163,10 +161,10 @@ function writeToDb (thisLake, year) {
     iceOutDate = thisLake["ice_out_date"];
     iceOutMedian = thisLake["ice_out_median_since_1950"];
     //console.log("IceOutMedian: ", iceOutMedian);
-    medianDiff = getMedianDiff(iceOutDate, iceOutMedian);
-    dQuartile = getDectile(thisLake["dQuality"]);
+    //medianDiff = getMedianDiff(iceOutDate, iceOutMedian);
+    //dQuartile = getDectile(lakeData[lakeName]["dQuality"]);
 
-    console.log("Lake: " + lake + " Year: " + year + " IceOutDate: " + iceOutDate + " IceOutMedian: " + iceOutMedian + " MedianDiff: " + medianDiff + " dQuartile: " + dQuartile);
+   /* console.log("Lake: " + lake + " Year: " + year + " IceOutDate: " + iceOutDate + " IceOutMedian: " + iceOutMedian + " MedianDiff: " + medianDiff + " dQuartile: " + dQuartile);*/
 }
 
 function getMedianDiff(iceOutDate, iceOutMedian) {
@@ -184,7 +182,7 @@ function getMedianDiff(iceOutDate, iceOutMedian) {
     var dateDiff = Date.parse(calcIce) - Date.parse(calcMedian);
     var dateDiv = dateDiff/86400000/365;
 
-    console.log("Median Diff %: " + precise_round((dateDiv * 100),1)+ "%");
+    /*console.log("Median Diff %: " + precise_round((dateDiv * 100),1)+ "%");*/
     return precise_round((dateDiv * 100),1);
 
     //console.log(parsedIceOut - parsedMedian);
@@ -204,18 +202,18 @@ function getDataQuality(thisLake) {
 }
 function calcDectiles(array) {
     sortedArray = array.sort(sortNumber);
-    console.log("sorted array: " + sortedArray);
+    /*console.log("sorted array: " + sortedArray);*/
     var dectile = sortedArray.length/10;
-    return [array[dectile], array[dectile*2], array[dectile*3], array[dectile*4], array[dectile*5], array[dectile*6], array[dectile*7], array[dectile*8], array[dectile*9], array[dectile*10]];
+    return [array[dectile], array[dectile*2], array[dectile*3], array[dectile*4], array[dectile*5], array[dectile*6], array[dectile*7], array[dectile*8], array[dectile*9], 100];
 }
 
 function getDectile(dQuality) {
-    console.log("Dectiles length: " + dectiles.length);
+   /* console.log("Dectiles length: " + dectiles.length);*/
 
     for (var l=0; l < dectiles.length + 1; l++) {
-        console.log("dquality: " + dQuality);
+        /*console.log("dquality: " + dQuality);*/
         if (dQuality < dectiles[l]) {
-            console.log("Dectile calculated: " + (l+1) + " for " + thisLake[name] + " with dquality " + lakeData[lakeName]["dQuality"]);
+            /*console.log("Dectile calculated: " + (l+1) +  "with dquality " + lakeData[lakeName]["dQuality"]);*/
             return l + 1;
         }
     }
