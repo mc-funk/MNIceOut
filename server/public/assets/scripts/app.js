@@ -15,7 +15,7 @@
 //var queryYear = 0;
 //var query="";
 var lakeData = {}, numLakes = 0, thisLake, lakeName = 0, i = 0, dQualArray = [],
-    earliestYear = [], numEntries = [], dectiles = [];
+    earliestYear = [], numEntries = [], dectiles = [], medianDifferences = [];
 //Initialize to stat and end dates for analysis
 var startYear = 1850, endYear = 1855;
 
@@ -121,6 +121,7 @@ function yearLoop() {
                     complete: function (jqXHR, textStatus) {
                         if (q == endYear) {
                             console.log("Lake data after year: ", lakeData);
+                            console.log("Median data array: ", medianDifferences.sort(sortNumber))
                         }
                     }
                 });
@@ -139,12 +140,14 @@ function processYearData(yearData, year) {
     if (errorCheck != "ERROR") {
         console.log("yearData processed for year " + year + "; " + yearData.results.length + " lakes processed");
         for (i = 0; i < yearData.results.length; i++) {
-            /*console.log("For loop entered");*/
             thisLake = yearData.results[i];
             lakeName = thisLake["name"];
             thisIceOut = thisLake["ice_out_date"];
-            /*console.log("lakeName: ", lakeName);*/
-            lakeData[lakeName]["allYears"].push([year, thisIceOut]);
+            thisMedian = thisLake[""];
+            medianDiff = getMedianDiff(thisIceOut, thisLake["ice_out_median_since_1950"]);
+            console.log("medianDiff");
+            medianDifferences.push(medianDiff);
+            lakeData[lakeName]["allYears"].push([year, thisIceOut, medianDiff]);
             writeToDb(thisLake, year);
         }
     }
@@ -193,13 +196,10 @@ function getMedianDiff(iceOutDate, iceOutMedian) {
 function getDataQuality(thisLake) {
     var possibleYears = 172; //endYear - startYear;
     var entries = thisLake["ice_out_number_of_entries"];
-    //console.log("Possible years: " + possibleYears);
-    //console.log("Entries: " + entries);
-    //console.log("Entries/Poss Years : " + entries / possibleYears);
-    //console.log("Precise Round Test: " + precise_round(((entries / possibleYears) * 100),1));
     //console.log(precise_round(((entries / possibleYears) * 100),1));
     return precise_round(((entries / possibleYears) * 100),1);
 }
+
 function calcDectiles(array) {
     sortedArray = array.sort(sortNumber);
     /*console.log("sorted array: " + sortedArray);*/
@@ -208,8 +208,6 @@ function calcDectiles(array) {
 }
 
 function getDectile(dQuality) {
-   /* console.log("Dectiles length: " + dectiles.length);*/
-
     for (var l=0; l < dectiles.length + 1; l++) {
         /*console.log("dquality: " + dQuality);*/
         if (dQuality < dectiles[l]) {
