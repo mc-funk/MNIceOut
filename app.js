@@ -5,9 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var mnIceout = require('./server/routes/iceout');
 var routes = require('./server/routes/index');
-//var users = require('./server/routes/users');
-//var iceout = require('./server/routes/iceout');
 
 var app = express();
 
@@ -19,7 +18,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 //app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/iceout', mnIceout);
 app.use('/', routes);
+
 //app.use('/users', users);
 //app.use('/data', iceout);
 
