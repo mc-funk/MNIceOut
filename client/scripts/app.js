@@ -31,8 +31,10 @@ myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
     $scope.displayedCollection = [].concat($scope.rowCollection);
     console.log("Displayed collection:", $scope.displayedCollection);
 
-    getLakes();
-    function getLakes() {
+    $scope.displayedCollection = getLakes($scope.displayedCollection);
+    console.log("Displayed collection in controller after getLakes():", $scope.displayedCollection);
+
+    function getLakes(scope) {
 /*        console.log("GetLakes called");
         return $http.get('/iceout').success(function(data, status){
             console.log("http callback called");
@@ -44,7 +46,7 @@ myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
             return data;
         });*/
         //Initialize to stat and end dates for analysis
-        var startYear = 1850, endYear = 1855;
+        var startYear = 1950, endYear = 1955;
         /*console.log("getData click worked");*/
         $.ajax({
             type: 'GET',
@@ -67,6 +69,7 @@ myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
 
         function getIceOut() {
             /*console.log("Callback function called")*/
+            console.log("Displayed collection in controller after getLakes():", $scope.displayedCollection);
         }
 
         function processLakeData(medianData) {
@@ -248,8 +251,9 @@ myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
                 if (lakeData.hasOwnProperty(oneLake)) {
                     if (lakeData[oneLake]["allYears"]) {
                         for (var m = 0; m < lakeData[oneLake]["allYears"].length; m++) {
-                            lakeArray.push(
-                                {
+                            console.log("array info: ", lakeData[oneLake]);
+                            lakeArray.push(lakeData[oneLake]);
+                               /* {
                                     name: oneLake,
                                     year: lakeData[oneLake]["allYears"][m][0],
                                     iceOut: lakeData[oneLake]["allYears"][m][1],
@@ -264,8 +268,10 @@ myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
                                     median: lakeData[oneLake]["ice_out_median_since_1950"],
                                     lakeId: lakeData[oneLake]["id"],
                                     dQuality: lakeData[oneLake]["dQuality"]
-                                }
-                            );
+                                });*/
+                            lakeArray[m].year = lakeData[oneLake]["allYears"][m][0];
+                            lakeArray[m].iceOut = lakeData[oneLake]["allYears"][m][1];
+                            lakeArray[m].medianDiff = lakeData[oneLake]["allYears"][m][2];
                         }
                     }
                 }
