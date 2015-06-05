@@ -16,9 +16,22 @@ var lakeData = {}, numLakes = 0, thisLake, lakeName = 0, i = 0, dQualArray = [],
     earliestYear = [], numEntries = [], dectiles = [], medianDifferences = [], lakeArray = [];
 
 /*//TODO: ensure correct timespan*/
-myApp.controller('basicsCtrl', ['$scope', '$http', function ($scope, $http) {
-    $scope.rowCollection =[];
+myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
+    $scope.rowCollection = [];
+    $scope.rowCollection.push({
+        name: "Test",
+        year: 2000,
+        iceOut:"2000-01-01",
+        medianDiff: 4.6,
+        median:"200-02-02",
+        entries:12,
+        dectile: 5
+    });
+    console.log("Row collection: ", $scope.rowCollection);
+    $scope.displayedCollection = [].concat($scope.rowCollection);
+    console.log("Displayed collection:", $scope.displayedCollection);
 
+    getLakes();
     function getLakes() {
 /*        console.log("GetLakes called");
         return $http.get('/iceout').success(function(data, status){
@@ -130,13 +143,16 @@ myApp.controller('basicsCtrl', ['$scope', '$http', function ($scope, $http) {
                                 if (q == endYear) {
                                     console.log("Lake data after year: ", lakeData);
                                     /* console.log("Median data array: ", medianDifferences.sort(sortNumber))*/
-                                    console.log("Lake array after year:", convertTable(lakeData));
-                                    console.log("Lake array:", lakeArray);
-                                    return lakeArray;
+                                    console.log("Lake Array: ", convertTable(lakeData));
+                                    $scope.rowCollection = convertTable(lakeData);
+                                    console.log("New rowCollection: ", $scope.rowCollection);
+                                    $scope.displayedCollection = [].concat($scope.rowCollection);
+                                    console.log("New displayedCollection: ", $scope.displayedCollection);
+                                    return $scope.displayedCollection;
                                 }
                             }
                         });
-                    }, (1000 * (q - startYear)))
+                    }, (666 * (q - startYear)))
                 })(j);
             }
         }
@@ -227,10 +243,9 @@ myApp.controller('basicsCtrl', ['$scope', '$http', function ($scope, $http) {
 
         function convertTable(lakeData) {
             console.log(lakeData);
+            lakeArray = [];
             for (var oneLake in lakeData) {
-                console.log("truthy: ", lakeData.hasOwnProperty(oneLake));
                 if (lakeData.hasOwnProperty(oneLake)) {
-                    console.log(lakeData[oneLake]["allYears"]);
                     if (lakeData[oneLake]["allYears"]) {
                         for (var m = 0; m < lakeData[oneLake]["allYears"].length; m++) {
                             lakeArray.push(
@@ -251,12 +266,10 @@ myApp.controller('basicsCtrl', ['$scope', '$http', function ($scope, $http) {
                                     dQuality: lakeData[oneLake]["dQuality"]
                                 }
                             );
-                            console.log("In loop lakeArray: "+ lakeArray);
                         }
                     }
                 }
             }
-            console.log("LakeArray:", lakeArray);
             return lakeArray;
         }
     }
@@ -276,7 +289,6 @@ myApp.controller('basicsCtrl', ['$scope', '$http', function ($scope, $http) {
 //    console.log("sorted array: " + sortedArray);
 //}
 
-    $scope.rowCollection = getLakes();
 }]);
 
 //Helper function created solely to track down inconsistencies in API data (takes in first_date)
