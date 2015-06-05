@@ -14,11 +14,81 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
 var queryYear = "";
 var lakeData = {}, numLakes = 0, thisLake, lakeName = 0, i = 0, dQualArray = [],
     earliestYear = [], numEntries = [], dectiles = [], medianDifferences = [], lakeArray = [];
+var dummyData = [
+    {
+        allYears: Array[2],
+        dQuality: 70.3,
+        dectile: 10,
+        entries: 121,
+        firstYear: "1930-04-15",
+        iceOut: "1950-05-02",
+        lakeId: "01006200",
+        lastYear: "2015-04-12",
+        lat: "46.76126",
+        lon: "-93.28604",
+        median: "2099-04-21",
+        medianDiff: 5.2,
+        name: "Big Sandy",
+        sentinel: 0,
+        year: 1950
+    },
+    {
+        allYears: Array[18],
+        dQuality: 72.1,
+        dectile: 10,
+        entries: 124,
+        firstYear: "1874-04-24",
+        iceOut: "1955-04-11",
+        lakeId: "81001401",
+        lastYear: "2015-03-22",
+        lat: "44.08707",
+        lon: "-93.48469",
+        median: "2099-04-04",
+        medianDiff: -0.5,
+        name: "Clear",
+        sentinel: 0,
+        year: 1955
+    },
+    {
+        allYears: [],
+        dQuality: 72.1,
+        dectile: 10,
+        entries: 124,
+        firstYear: "1843-05-20",
+        iceOut: "1951-04-21",
+        lakeId: "25000100",
+        lastYear: "2015-03-29",
+        lat: "44.49247",
+        lon: "-92.27946",
+        median: "2099-03-31",
+        medianDiff: 5.8,
+        name: "Pepin",
+        sentinel: 0,
+        year: 1951
+    },
+    {
+        allYears: [],
+        dQuality: 72.1,
+        dectile: 10,
+        entries: 124,
+        firstYear: "1843-05-20",
+        iceOut: "1952-03-17",
+        lakeId: "25000100",
+        lastYear: "2015-03-29",
+        lat: "44.49247",
+        lon: "-92.27946",
+        median: "2099-03-31",
+        medianDiff: -3.8,
+        name: "Pepin",
+        sentinel: 0,
+        year: 1952
+    }
+];
 
 /*//TODO: ensure correct timespan*/
 myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
-    $scope.rowCollection = [];
-    $scope.rowCollection.push({
+    $scope.rowCollection = dummyData;
+/*    $scope.rowCollection.push({
         name: "Test",
         year: 2000,
         iceOut:"2000-01-01",
@@ -26,15 +96,18 @@ myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
         median:"200-02-02",
         entries:12,
         dectile: 5
-    });
-    console.log("Row collection: ", $scope.rowCollection);
+    });*/
+/*    console.log("Row collection: ", $scope.rowCollection);*/
     $scope.displayedCollection = [].concat($scope.rowCollection);
-    console.log("Displayed collection:", $scope.displayedCollection);
+/*    console.log("Displayed collection:", $scope.displayedCollection);*/
 
+    getLakes($scope.displayedCollection);
+/*
     $scope.displayedCollection = getLakes($scope.displayedCollection);
     console.log("Displayed collection in controller after getLakes():", $scope.displayedCollection);
+*/
 
-    function getLakes(scope) {
+    function getLakes($scope) {
 /*        console.log("GetLakes called");
         return $http.get('/iceout').success(function(data, status){
             console.log("http callback called");
@@ -114,6 +187,7 @@ myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
                 /*console.log("lakeData[lakeName][dQuality]" + lakeData[lakeName]["dQuality"]);*/
                 lakeData[lakeName]["dectile"] = getDectile(lakeData[lakeName]["dQuality"]);
             }
+            console.log("Lake-level data object: ", lakeData);
             //processDataQuartiles(numEntries);
             /*console.log("lake data: ", lakeData);
              console.log("There are " + numLakes + " lakes");*/
@@ -144,11 +218,11 @@ myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
                             },
                             complete: function (jqXHR, textStatus) {
                                 if (q == endYear) {
-                                    console.log("Lake data after year: ", lakeData);
+                                    console.log("Lake data after year-level analysis: ", lakeData);
                                     /* console.log("Median data array: ", medianDifferences.sort(sortNumber))*/
-                                    console.log("Lake Array: ", convertTable(lakeData));
+                                   /* console.log("Lake Array: ", convertTable(lakeData));*/
                                     $scope.rowCollection = convertTable(lakeData);
-                                    console.log("New rowCollection: ", $scope.rowCollection);
+                                  /*  console.log("New rowCollection: ", $scope.rowCollection);*/
                                     $scope.displayedCollection = [].concat($scope.rowCollection);
                                     console.log("New displayedCollection: ", $scope.displayedCollection);
                                     return $scope.displayedCollection;
@@ -173,7 +247,6 @@ myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
                     medianDiff = getMedianDiff(thisIceOut, thisLake["ice_out_median_since_1950"]);
                     medianDifferences.push(medianDiff);
                     lakeData[lakeName]["allYears"].push([year, thisIceOut, medianDiff]);
-                    /*writeToDb(thisLake, year);*/
                 }
             }
         }
@@ -245,13 +318,11 @@ myApp.controller('safeCtrl', ['$scope', '$http', function ($scope, $http) {
         }
 
         function convertTable(lakeData) {
-            console.log(lakeData);
             lakeArray = [];
             for (var oneLake in lakeData) {
                 if (lakeData.hasOwnProperty(oneLake)) {
                     if (lakeData[oneLake]["allYears"]) {
                         for (var m = 0; m < lakeData[oneLake]["allYears"].length; m++) {
-                            console.log("array info: ", lakeData[oneLake]);
                             lakeArray.push(lakeData[oneLake]);
                                /* {
                                     name: oneLake,

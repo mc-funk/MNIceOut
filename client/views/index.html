@@ -2,6 +2,7 @@
 <html ng-app="myApp"> <!--You can set this equal to something or not.-->
 <head>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link rel="stylesheet" href="/vendor/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="assets/css/style.css"/>
 </head>
 
@@ -9,42 +10,43 @@
 <h1>Minnesota Ice-Out Data</h1>
 <h3>Source: Minnesota DNR</h3>
 <p><em>An "ice-out" date refers to the date on which the ice on the surface of a lake is determined to have thawed. Measures of ice-out in this data set vary from lake to lake.</em></p>
-<button id="getData">Get Data</button>
+<!--<button id="getData">Get Data</button>-->
 <!--<div ng-include="'/views/userinfo.html'"></div>-->
-<leaflet>
-    <div id="map"></div>
-</leaflet>
 <div ng-controller="safeCtrl">
-<table st-table="displayedCollection" ng-model="rowCollection" class="table table-striped">
-    <thead>
-    <tr>
-        <th st-sort="name">Lake name</th>
-        <th st-sort="name">Year</th>
-        <th st-sort="name">Ice Out Date</th>
-        <th st-sort="name">Diff from Median</th>
-        <th st-sort="name">Median</th>
-        <th st-sort="name">Entries</th>
-        <th st-sort="name">Qual Rank</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr ng-repeat="row in displayedCollection">
-        <td>{{row.name}}</td>
-        <td>{{row.year}}</td>
-        <td>{{row.iceOut}}</td>
-        <td>{{row.medianDiff}}</td>
-        <td>{{row.median}}</td>
-        <td>{{row.entries}}</td>
-        <td>{{row.dectile}}</td>
-    </tr>
-    </tbody>
-</table>
+    <table st-table="displayedCollection" ng-model="rowCollection" class="table table-striped">
+        <thead>
+        <tr>
+            <th st-sort="name">Lake name</th>
+            <th st-sort="name">Year</th>
+            <th st-sort="name">Ice Out Date</th>
+            <th st-sort="name">Diff from Median</th>
+            <th st-sort="name">Median</th>
+            <th st-sort="name">Entries</th>
+            <th st-sort="name">Qual Rank</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="row in displayedCollection">
+            <td>{{row.name}}</td>
+            <td>{{row.year}}</td>
+            <td>{{row.iceOut}}</td>
+            <td>{{row.medianDiff}}</td>
+            <td>{{row.median}}</td>
+            <td>{{row.entries}}</td>
+            <td>{{row.dectile}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <leaflet>
+        <div id="map"></div>
+    </leaflet>
 </div>
 
 <!--need both types of quotes here!!-->
 <script type="text/javascript" src="/vendor/jquery/dist/jquery.min.js"></script>
-<script type="text/javascript" src="/vendor/angular/angular.min.js"></script>
 <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+<script type="text/javascript" src="/vendor/angular/angular.min.js"></script>
+<script src="vendor/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
 <script src="/vendor/angular-smart-table/dist/smart-table.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="assets/scripts/app.js"></script>
 
