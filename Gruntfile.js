@@ -22,6 +22,9 @@ module.exports = function(grunt) {
                     "angular/angular-csp.css",
                     "jquery/dist/jquery.min.js",
                     "jquery/dist/jquery.min.map",
+                    "angular-route/angular-route.js",
+                    "angular-route/angular-route.min.js",
+                    "angular-route/angular-route.min.js.map",
                     "angular-smart-table/dist/smart-table.min.js",
                     "bootstrap/dist/css/bootstrap.min.css",
                     "bootstrap/dist/js/bootstrap.min.js"
@@ -53,6 +56,12 @@ module.exports = function(grunt) {
                 cwd: "client/scripts/",
                 src: "app.js",
                 "dest": 'server/public/assets/scripts'
+            },
+            ngResource: {
+                expand: true,
+                cwd: "client/scripts/",
+                src: "angular-resource/angular-resource.min.js",
+                "dest": 'server/public/vendor'
             }
         }
     });

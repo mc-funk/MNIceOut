@@ -4,6 +4,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+/*var angular = require('angular');*/
+/*var ngRoute = require('angular-route');
+var ngResource = require('ng-resource');*/
 
 var mnIceout = require('./server/routes/iceout');
 var routes = require('./server/routes/index');
